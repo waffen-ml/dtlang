@@ -8,11 +8,11 @@ using namespace std;
 
 
 enum SymbolType {
-    LP, RP
+    LP, RP, COMMA
 };
 
 enum TokenType {
-    LIT_INTERGER, NAME, SYMBOL,
+    LIT_INTERGER, LIT_FLOAT, NAME, SYMBOL,
     OPERATOR
 };
 
@@ -29,5 +29,7 @@ bool parseOperator(string buff, int & pos, Token** token);
 bool parseSymbol(string buff, int& pos, Token** token);
 
 bool parseLiteralInteger(string buff, int& pos, Token** token, CompileTime * ct);
+
+bool parseLiteralFloat(string buff, int& pos, Token** token, CompileTime * ct);
 
 vector<Token> parseExpression(string buff, int & pos, CompileTime * ct);

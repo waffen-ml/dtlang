@@ -3,10 +3,14 @@
 
 using namespace std;
 
-void ChainNode::printType() {
+void ChainNode::print(ExecuteBundle b) {
+
     switch(type) {
         case TEMP:
-            cout << "temp" << endl;
+            if (b.rt->temp[hook].type == INTEGER)
+                cout << "temp (int) " << b.rt->temp[hook].asInteger() << endl;
+            else
+                cout << "temp (float) " << b.rt->temp[hook].asFloat() << endl;
             break;
         case START:
             cout << "start" << endl;
@@ -23,22 +27,18 @@ void ChainNode::printType() {
     }
 }
 
-void ChainNode::printShallow() {
-    ChainNode* start = makeStart(this);
-    ChainNode* p = start;
+void ChainNode::printShallow(ExecuteBundle b) {
+    ChainNode* p = this;
 
     cout << "Chain(" << endl;
 
-    while(p->next != NULL) {
-        p->next->printType();
+    while(p != NULL) {
+        p->print(b);
         p = p->next;
     }
 
     cout << ")" << endl;
-
-    delete start;
 }
-
 
 
 ChainNode* makeStart(ChainNode* next) {
@@ -61,6 +61,7 @@ ChainNode* processChainFolds(ChainNode* node, ChainNode** join) {
                     break;
                 case RP:
                     *join = p->next->next;
+                    p->next = NULL;
                     return start->next;
             }
         }
@@ -88,6 +89,15 @@ ChainNode* buildChainFromTokens(vector<Token> & expr) {
     return result;
 }
 
+ChainNode* safeAccess(ChainNode* node, int offset) {
+    ChainNode* p = node;
 
+    while(offset > 0 && p != NULL) {
+        p = p->next;
+        offset--;
+    }
+
+    return p;
+}
 
 

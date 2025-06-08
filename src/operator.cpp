@@ -25,5 +25,22 @@ int getOperatorPriority(OperatorType op) {
 }
 
 bool isOperatorBinary(OperatorType op) {
-    return true;
+    switch(op) {
+        case INCREMENT:
+        case DECREMENT:
+            return false;
+        default:
+            return true;
+    }
+}
+
+bool isOperatorUnary(OperatorType op) {
+    switch(op) {
+        case SUB:true;
+        case INCREMENT:
+        case DECREMENT:
+            return true;
+        default:
+            return false;
+    }
 }

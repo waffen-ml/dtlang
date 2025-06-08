@@ -16,10 +16,9 @@ bool isValidNameExtension(char ch) {
     return isValidNameStart(ch) || isDigit(ch);
 }
 
-int naiveIntegerPow(int a, int n) {
-    int m = 1;
-    for (int i = 0; i < n; i++)
+long naiveIntegerPow(long a, long n) {
+    long m = 1;
+    for (long i = 0; i < n; i++)
         m *= a;
     return m;
 }
-

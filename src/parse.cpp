@@ -4,6 +4,7 @@
 #include "core.h"
 #include "utils.h"
 #include "operator.h"
+#include <cmath>
 
 #include <iostream>
 
@@ -35,6 +36,8 @@ bool parseOperator(string buff, int & pos, Token** token) {
     else if(s == "<=") type = LTE;
     else if(s == ">=") type = GTE;
     else if(s == "**") type = POW;
+    else if(s == "++") type = INCREMENT;
+    else if(s == "--") type = DECREMENT;
     else {
         pos -= 1;
         switch(a) {
@@ -84,6 +87,9 @@ bool parseSymbol(string buff, int& pos, Token** token) {
         case ')':
             type = RP;
             break;
+        case ',':
+            type = COMMA;
+            break;
         default:
             pos -= 1;
             return false;
@@ -96,7 +102,7 @@ bool parseSymbol(string buff, int& pos, Token** token) {
 
 bool parseLiteralInteger(string buff, int& pos, Token** token, CompileTime * ct) {
     int len = 0;
-    int value = 0;
+    INT_NATIVE_TYPE value = 0;
     while (pos + len < buff.length() && isDigit(buff.at(pos + len))) {
         value = value * 10 + (buff.at(pos + len) - '0');
         len++;
@@ -107,6 +113,46 @@ bool parseLiteralInteger(string buff, int& pos, Token** token, CompileTime * ct)
     int integerId = ct->saveLiteralInteger(value);
     *token = new Token(LIT_INTERGER, integerId);
     pos += len;
+    return true;
+}
+
+bool parseLiteralFloat(string buff, int& pos, Token** token, CompileTime * ct) {
+    int len1 = 0;
+    int val1 = 0;
+
+    while(pos + len1 < buff.length() && isDigit(buff.at(pos + len1))) {
+        val1 = val1 * 10 + (buff.at(pos + len1) - '0');
+        len1++;
+    }
+
+    if (len1 == 0 || pos + len1 == buff.length() || buff.at(pos + len1) != '.')
+        return false;
+
+    int len2 = 0;
+    int val2 = 0;
+
+    while(pos + len1 + 1 + len2 < buff.length() && isDigit(buff.at(pos + len1 + 1 + len2))) {
+        val2 = val2 * 10 + (buff.at(pos + len1 + 1 + len2) - '0');
+        len2++;
+    }
+
+    if (len2 == 0)
+        return false;
+
+    FLOAT_NATIVE_TYPE dec = 0;
+
+    for (int i = len2; i > 0; i--) {
+        dec += val2 % 10;
+        dec /= 10;
+        val2 /= 10;
+
+    }
+
+    FLOAT_NATIVE_TYPE value = val1 + dec;
+    
+    int floatId = ct->saveLiteralFloat(value);
+    *token = new Token(LIT_FLOAT, floatId);
+    pos = pos + len1 + len2 + 1;
     return true;
 }
 
@@ -122,6 +168,7 @@ vector<Token> parseExpression(string buff, int & pos, CompileTime * ct) {
         if(
             parseName(buff, pos, &parsed, ct) ||
             parseOperator(buff, pos, &parsed) ||
+            parseLiteralFloat(buff, pos, &parsed, ct) ||
             parseLiteralInteger(buff, pos, &parsed, ct) ||
             parseSymbol(buff, pos, &parsed)
         ) {

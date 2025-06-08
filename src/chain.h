@@ -1,6 +1,7 @@
 #pragma once
 
 #include "parse.h"
+#include "core.h"
 #include <vector>
 
 using namespace std;
@@ -24,9 +25,9 @@ public:
         return type == TEMP || type == VAR;
     }
 
-    void printType();
+    void print(ExecuteBundle b);
 
-    void printShallow();
+    void printShallow(ExecuteBundle b);
 };
 
 
@@ -36,3 +37,4 @@ ChainNode* buildChainFromTokens(vector<Token> & expr);
 
 ChainNode* processChainFolds(ChainNode* node, ChainNode** join);
 
+ChainNode* safeAccess(ChainNode* node, int offset);
